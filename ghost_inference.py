@@ -14,7 +14,8 @@ from arcface_model.iresnet import iresnet100
 from models.pix2pix_model import Pix2PixModel
 from models.config_sr import TestOptions
 
-def ghost_inference(source,):
+#source - avatar target - human image
+def ghost_inference(source_full, target_full):
 
     app = Face_detect_crop(name='antelope', root='./insightface_func/models')
     app.prepare(ctx_id= 0, det_thresh=0.6, det_size=(640,640))
@@ -47,13 +48,13 @@ def ghost_inference(source,):
     crop_size = 224 # don't change this
     BS = 60
     try:    
-        source = crop_face(source, app, crop_size)[0]
+        source = crop_face(source_full, app, crop_size)[0]
         source = [source[:, :, ::-1]]
         print("Everything is ok!")
     except TypeError:
         print("Bad source images")
 
-    full_frames = [source]
+    full_frames = [target_full]
     target = get_target(full_frames, app, crop_size)
 
     final_frames_list, crop_frames_list, full_frames, tfm_array_list = model_inference(full_frames,
@@ -70,5 +71,4 @@ def ghost_inference(source,):
         final_frames_list = face_enhancement(final_frames_list, model)
 
     result = get_final_image(final_frames_list, crop_frames_list, full_frames[0], tfm_array_list, handler)
-    show_images([source[0][:, :, ::-1], source, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
-                                                                               
+    show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
