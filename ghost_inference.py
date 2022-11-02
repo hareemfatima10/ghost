@@ -46,14 +46,15 @@ def ghost_inference(source_full, target_full):
         model = Pix2PixModel(opt)
         model.netG.train()
     crop_size = 224 # don't change this
-    BS = 60
+    source_full = cv2.copyMakeBorder(source_full, 200, 200, 200, 200, cv2.BORDER_CONSTANT, value=(0.0, 0.0, 0.0))
+    batch_size = 40
     try:    
         source = crop_face(source_full, app, crop_size)[0]
         source = [source[:, :, ::-1]]
         print("Everything is ok!")
     except TypeError:
         print("Bad source images")
-
+    target_full = cv2.copyMakeBorder(target_full, 100, 100, 100, 100, cv2.BORDER_CONSTANT, value=(0.0, 0.0, 0.0))
     full_frames = [target_full]
     target = get_target(full_frames, app, crop_size)
 
@@ -65,7 +66,7 @@ def ghost_inference(source_full, target_full):
                                                                                    app,
                                                                                    set_target = False,
                                                                                    crop_size=crop_size,
-                                                                                   BS=BS)
+                                                                                   BS=batch_size)
 
     if use_sr:
         final_frames_list = face_enhancement(final_frames_list, model)
