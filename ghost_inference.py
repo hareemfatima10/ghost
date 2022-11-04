@@ -3,9 +3,9 @@ import torch
 import time
 import os
 
-from utils.inference.image_processing import crop_face, get_final_image, show_images
-from utils.inference.video_processing import read_video, get_target, get_final_video, add_audio_from_another_video, face_enhancement
-from utils.inference.core import model_inference
+from GHOST.utils.inference.image_processing import crop_face, get_final_image, show_images
+from GHOST.utils.inference.video_processing import read_video, get_target, get_final_video, add_audio_from_another_video, face_enhancement
+from GHOST.utils.inference.core import model_inference
 
 from network.AEI_Net import AEI_Net
 from coordinate_reg.image_infer import Handler
