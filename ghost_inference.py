@@ -17,24 +17,24 @@ from models.config_sr import TestOptions
 #source - avatar target - human image
 def ghost_inference(source_full, target_full):
 
-    app = Face_detect_crop(name='antelope', root='/content/ghost/insightface_func/models')
+    app = Face_detect_crop(name='antelope', root='/content/insightface_func/models')
     app.prepare(ctx_id= 0, det_thresh=0.6, det_size=(640,640))
 
     # main model for generation
     G = AEI_Net(backbone='unet', num_blocks=2, c_id=512)
     G.eval()
-    G.load_state_dict(torch.load('/content/ghost/weights/G_unet_2blocks.pth', map_location=torch.device('cpu')))
+    G.load_state_dict(torch.load('/content/weights/G_unet_2blocks.pth', map_location=torch.device('cpu')))
     G = G.cuda()
     G = G.half()
 
     # arcface model to get face embedding
     netArc = iresnet100(fp16=False)
-    netArc.load_state_dict(torch.load('/content/ghost/arcface_model/backbone.pth'))
+    netArc.load_state_dict(torch.load('/content/arcface_model/backbone.pth'))
     netArc=netArc.cuda()
     netArc.eval()
 
     # model to get face landmarks
-    handler = Handler('/content/ghost/coordinate_reg/model/2d106det', 0, ctx_id=0, det_size=640)
+    handler = Handler('/content/GHOST/coordinate_reg/model/2d106det', 0, ctx_id=0, det_size=640)
 
     # model to make superres of face, set use_sr=True if you want to use super resolution or use_sr=False if you don't
     use_sr = False
@@ -72,8 +72,8 @@ def ghost_inference(source_full, target_full):
    
     result = get_final_image(final_frames_list, crop_frames_list, full_frames[0], tfm_array_list, handler)
     #show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
-    ghost_result.append((result, source[0][:, :, ::-1]))
-    return ghost_result
+    #ghost_result.append((result, source[0][:, :, ::-1]))
+    return result, source[0][:, :, ::-1]
 
 def ghost_transformation(input_images):
   ghost_res = []
