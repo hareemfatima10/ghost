@@ -17,19 +17,19 @@ from models.config_sr import TestOptions
 #source - avatar target - human image
 def ghost_inference(source_full, target_full):
 
-    app = Face_detect_crop(name='antelope', root='/content/GHOST/insightface_func/models')
+    app = Face_detect_crop(name='antelope', root='/content/insightface_func/models')
     app.prepare(ctx_id= 0, det_thresh=0.6, det_size=(640,640))
 
     # main model for generation
     G = AEI_Net(backbone='unet', num_blocks=2, c_id=512)
     G.eval()
-    G.load_state_dict(torch.load('/content/GHOST/weights/G_unet_2blocks.pth', map_location=torch.device('cpu')))
+    G.load_state_dict(torch.load('/content/weights/G_unet_2blocks.pth', map_location=torch.device('cpu')))
     G = G.cuda()
     G = G.half()
 
     # arcface model to get face embedding
     netArc = iresnet100(fp16=False)
-    netArc.load_state_dict(torch.load('/content/GHOST/arcface_model/backbone.pth'))
+    netArc.load_state_dict(torch.load('/content/arcface_model/backbone.pth'))
     netArc=netArc.cuda()
     netArc.eval()
 
