@@ -17,24 +17,24 @@ from models.config_sr import TestOptions
 #source - avatar target - human image
 def ghost_inference(source_full, target_full):
 
-    app = Face_detect_crop(name='antelope', root='/content/GHOST/insightface_func/models')
+    app = Face_detect_crop(name='antelope', root='/content/ghost/insightface_func/models')
     app.prepare(ctx_id= 0, det_thresh=0.6, det_size=(640,640))
 
     # main model for generation
     G = AEI_Net(backbone='unet', num_blocks=2, c_id=512)
     G.eval()
-    G.load_state_dict(torch.load('/content/GHOST/weights/G_unet_2blocks.pth', map_location=torch.device('cpu')))
+    G.load_state_dict(torch.load('/content/ghost/weights/G_unet_2blocks.pth', map_location=torch.device('cpu')))
     G = G.cuda()
     G = G.half()
 
     # arcface model to get face embedding
     netArc = iresnet100(fp16=False)
-    netArc.load_state_dict(torch.load('/content/GHOST/arcface_model/backbone.pth'))
+    netArc.load_state_dict(torch.load('/content/ghost/arcface_model/backbone.pth'))
     netArc=netArc.cuda()
     netArc.eval()
 
     # model to get face landmarks
-    handler = Handler('/content/GHOST/coordinate_reg/model/2d106det.zip', 0, ctx_id=0, det_size=640)
+    handler = Handler('/content/ghost/coordinate_reg/model/2d106det', 0, ctx_id=0, det_size=640)
 
     # model to make superres of face, set use_sr=True if you want to use super resolution or use_sr=False if you don't
     use_sr = False
@@ -46,15 +46,14 @@ def ghost_inference(source_full, target_full):
         model = Pix2PixModel(opt)
         model.netG.train()
     crop_size = 224 # don't change this
-    source_full = cv2.copyMakeBorder(source_full, 200, 200, 200, 200, cv2.BORDER_CONSTANT, value=(0.0, 0.0, 0.0))
     batch_size = 40
+    ghost_result = []
     try:    
         source = crop_face(source_full, app, crop_size)[0]
         source = [source[:, :, ::-1]]
         print("Everything is ok!")
     except TypeError:
         print("Bad source images")
-    target_full = cv2.copyMakeBorder(target_full, 100, 100, 100, 100, cv2.BORDER_CONSTANT, value=(0.0, 0.0, 0.0))
     full_frames = [target_full]
     target = get_target(full_frames, app, crop_size)
 
@@ -70,15 +69,15 @@ def ghost_inference(source_full, target_full):
 
     if use_sr:
         final_frames_list = face_enhancement(final_frames_list, model)
-
+   
     result = get_final_image(final_frames_list, crop_frames_list, full_frames[0], tfm_array_list, handler)
-    show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
+    #show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
+    ghost_result.append((result, source[0][:, :, ::-1]))
+    return ghost_result
 
 def ghost_transformation(input_images):
-  source_arr = [] #avatar
-  target_arr = [] #images
+  ghost_res = []
   for index, tup in enumerate(input_images):
-    target_arr.append(tup[0]) #original images
-    source_arr.append(tup[1])
-  res = ghost_inference(source_arr, target_arr)
-  return res
+    res = ghost_inference(tup[1], tup[0])
+    ghost_res.append(res)
+  return ghost_res
