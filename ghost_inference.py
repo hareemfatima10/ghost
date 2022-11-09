@@ -55,7 +55,7 @@ def ghost_inference(source_full, target_full):
     except TypeError:
         print(type(source_full))
         print("Bad source images")
-    full_frames = [target_full[:, :, ::-1]]
+    full_frames = [target_full]
     target = get_target(full_frames, app, crop_size)
 
     final_frames_list, crop_frames_list, full_frames, tfm_array_list = model_inference(full_frames,
