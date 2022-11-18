@@ -13,7 +13,7 @@ from insightface_func.face_detect_crop_multi import Face_detect_crop
 from arcface_model.iresnet import iresnet100
 from models.pix2pix_model import Pix2PixModel
 from models.config_sr import TestOptions
-
+import matplotlib.pyplot as plt
 #source - avatar target - human image
 def ghost_inference(source_full, target_full):
 
@@ -50,14 +50,13 @@ def ghost_inference(source_full, target_full):
     ghost_result = []
     try:    
         source = crop_face(source_full, app, crop_size)[0]
-        source = [source[:, :, ::-1]]
+        source = [source]
         print("Everything is ok!")
     except TypeError:
-        print(type(source_full))
         print("Bad source images")
+    target_full = target_full[:,:,::-1]
     full_frames = [target_full]
     target = get_target(full_frames, app, crop_size)
-
     final_frames_list, crop_frames_list, full_frames, tfm_array_list = model_inference(full_frames,
                                                                                    source,
                                                                                    target,
@@ -70,10 +69,9 @@ def ghost_inference(source_full, target_full):
 
     if use_sr:
         final_frames_list = face_enhancement(final_frames_list, model)
-   
     result = get_final_image(final_frames_list, crop_frames_list, full_frames[0], tfm_array_list, handler)
-    #show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
-    #ghost_result.append((result, source[0][:, :, ::-1]))
+    show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
+    # ghost_result.append((result, source[0][:, :, ::-1]))
     return result, source_full
 
 def ghost_transformation(input_images):
