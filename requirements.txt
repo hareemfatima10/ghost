@@ -1,8 +1,8 @@
 numpy
 -f https://download.pytorch.org/whl/torch_stable.html
-torch==1.6.0+cu101
+torch==1.9.1+cu101
 -f https://download.pytorch.org/whl/torch_stable.html
-torchvision==0.7.0+cu101
+torchvision==0.10.1+cu101
 opencv-python
 onnx==1.9.0
 onnxruntime-gpu==1.4.0
