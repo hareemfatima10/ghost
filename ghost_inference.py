@@ -50,21 +50,14 @@ def ghost_inference(source_full, target_full):
     ghost_result = []
     try:    
         source = crop_face(source_full, app, crop_size)[0]
-        print("---------Source Crop:----------")
         source = [source]
-        plt.imshow(source[0])
-        plt.show()
         print("Everything is ok!")
     except TypeError:
-        print(type(source_full))
         print("Bad source images")
     target_full = target_full[:,:,::-1]
     full_frames = [target_full]
     target = get_target(full_frames, app, crop_size)
-    print("---------target:--------")
-    # target = [target[0][:,:,::-1]]
-    plt.imshow(target[0])
-    plt.show()
+    
     final_frames_list, crop_frames_list, full_frames, tfm_array_list = model_inference(full_frames,
                                                                                    source,
                                                                                    target,
@@ -77,14 +70,10 @@ def ghost_inference(source_full, target_full):
 
     if use_sr:
         final_frames_list = face_enhancement(final_frames_list, model)
-    print("---------final frames:--------")
-    plt.imshow(final_frames_list[0][0])
-    plt.show()
+    
     result = get_final_image(final_frames_list, crop_frames_list, full_frames[0], tfm_array_list, handler)
-    print("-----------Final:-----------------")
-    plt.imshow(result)
-    plt.show()
-    show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
+    
+    #show_images([source[0][:, :, ::-1], target_full, result], ['Source Image', 'Target Image', 'Swapped Image'], figsize=(20, 15)) 
     # ghost_result.append((result, source[0][:, :, ::-1]))
     return result, source_full
 
