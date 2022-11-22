@@ -50,13 +50,15 @@ def ghost_inference(source_full, target_full):
     ghost_result = []
     try:    
         source = crop_face(source_full, app, crop_size)[0]
-        source = [source]
+        source = [source[:,:,::-1]]
         print("Everything is ok!")
     except TypeError:
         print("Bad source images")
-    target_full = target_full[:,:,::-1]
+    #target_full = target_full[:,:,::-1]
     full_frames = [target_full]
     target = get_target(full_frames, app, crop_size)
+    
+    # target = [target[0][:,:,::-1]]
     
     final_frames_list, crop_frames_list, full_frames, tfm_array_list = model_inference(full_frames,
                                                                                    source,
